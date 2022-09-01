@@ -1,0 +1,22 @@
+#!/bin/sh
+
+RNJESUS=$(( ( RANDOM % 100 )  + 1 ))
+WEEKDAY=$(date "+%A")
+
+FILES_CHANGED=$(git diff --name-only HEAD | wc -l)
+COMMIT_MSG=$(cat .git/COMMIT_EDITMSG)
+BRANCH=$(git branch --show-current)
+HASH_SHORT=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 | sha256sum | cut -d " " -f1 | head -c 7)
+
+GIT_CHANGES=$(git diff --stat HEAD | grep changed)
+N_INSERT=$(echo $GIT_CHANGES | cut -d',' -f2 | tr -d ' ' | head -c 1)
+N_DELETE=$(echo $GIT_CHANGES | cut -d',' -f3 | tr -d ' ' | head -c 1)
+
+if [ $RNJESUS -lt 40 -a $WEEKDAY = "Monday" -o $WEEKDAY = "Friday" ]; then
+	echo "[$BRANCH $HASH_SHORT] $COMMIT_MSG"
+	echo " $FILES_CHANGED files changed, $N_INSERT insertions(+), $N_DELETE deletions(-)"
+	exit 1
+else
+	exit 0
+fi
+
